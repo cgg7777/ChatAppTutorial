@@ -1,4 +1,5 @@
-import React, { useRef } from "react";
+import { firebase, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "../../firebase";
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 
@@ -7,19 +8,28 @@ function RegisterPage() {
         register,
         watch,
         formState: { errors },
+        handleSubmit,
     } = useForm();
-
-    console.log(watch("email"));
-
+    const [errorFromSubmit, setErrorFromSubmit] = useState("");
     const password = useRef();
     password.current = watch("password");
-
+    const onSubmit = async (data) => {
+        try {
+            let createdUser = await createUserWithEmailAndPassword(firebase, data.email, data.password);
+            console.log(createdUser);
+        } catch (error) {
+            setErrorFromSubmit(error.message);
+            setTimeout(() => {
+                setErrorFromSubmit("");
+            }, 5000);
+        }
+    };
     return (
         <div className="auth-wrapper">
             <div style={{ textAlign: "center" }}>
                 <h3>Register</h3>
             </div>
-            <form>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <label>Email</label>
                 <input type="email" {...register("email", { required: true, pattern: /^\S+@\S+$/i })} />
                 {errors.email && errors.email.type === "required" && <p>This field is required</p>}
@@ -48,7 +58,9 @@ function RegisterPage() {
                 {errors.passwordConfirm && errors.passwordConfirm.type === "required" && <p>This field is required</p>}
                 {errors.passwordConfirm && errors.passwordConfirm.type === "validate" && <p>Password do not match</p>}
 
-                <input type="submit" />
+                {errorFromSubmit && <p>{errorFromSubmit}</p>}
+
+                <input value="SUBMIT" type="submit" />
                 <Link style={{ color: "gray", textDecoration: "none" }} to="login">
                     이미 아이디가 있다면
                 </Link>
