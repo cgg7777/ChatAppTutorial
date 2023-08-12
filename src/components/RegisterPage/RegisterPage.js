@@ -1,7 +1,8 @@
-import { firebase, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "../../firebase";
+import { firebase, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "../../firebase";
 import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import md5 from "md5";
 
 function RegisterPage() {
     const {
@@ -19,6 +20,10 @@ function RegisterPage() {
             setLoading(true);
             let createdUser = await createUserWithEmailAndPassword(firebase, data.email, data.password);
             console.log(createdUser);
+            await updateProfile(createdUser.user, {
+                displayName: data.name,
+            });
+
             setLoading(false);
         } catch (error) {
             setErrorFromSubmit(error.message);
