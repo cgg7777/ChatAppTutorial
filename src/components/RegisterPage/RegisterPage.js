@@ -1,4 +1,5 @@
-import { firebase, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "../../firebase";
+import { firebase, createUserWithEmailAndPassword, updateProfile } from "../../firebase";
+import { getDatabase, ref, set } from "firebase/database";
 import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
@@ -22,6 +23,11 @@ function RegisterPage() {
             console.log(createdUser);
             await updateProfile(createdUser.user, {
                 displayName: data.name,
+            });
+            // Save to Firebase Database
+            const db = getDatabase();
+            set(ref(db, "users/" + createdUser.user.uid), {
+                username: createdUser.user.displayName,
             });
 
             setLoading(false);
