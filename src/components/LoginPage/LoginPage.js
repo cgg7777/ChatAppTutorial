@@ -48,7 +48,7 @@ function LoginPage() {
                 {errorFromSubmit && <p>{errorFromSubmit}</p>}
 
                 <input value="SUBMIT" type="submit" disabled={loading} />
-                <Link style={{ color: "gray", textDecoration: "none" }} to="register">
+                <Link style={{ color: "gray", textDecoration: "none" }} to="/register">
                     아이디가 없다면...
                 </Link>
             </form>
