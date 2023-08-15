@@ -27,13 +27,11 @@ function App() {
         return <div>...loading</div>;
     } else {
         return (
-            // <Router>
             <Routes>
                 <Route exact path="/" element={<ChatPage />} />
                 <Route exact path="/login" element={<LoginPage />} />
                 <Route exact path="/register" element={<RegisterPage />} />
             </Routes>
-            // </Router>
         );
     }
 }
