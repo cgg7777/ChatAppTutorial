@@ -23,6 +23,7 @@ function RegisterPage() {
             console.log(createdUser);
             await updateProfile(createdUser.user, {
                 displayName: data.name,
+                photoURL: `http://www.gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`,
             });
             // Save to Firebase Database
             const db = getDatabase();
