@@ -12,7 +12,7 @@ function UserPanel() {
                 <IoIosChatboxes /> Chat App
             </h3>
             <div style={{ display: "flex", marginBottom: "1rem" }}>
-                <Image src="holder.js/171x180" style={{ width: "30px", height: "30px" }} roundedCircle />
+                <Image src={user && user.photoURL} style={{ width: "30px", height: "30px" }} roundedCircle />
                 <Dropdown>
                     <Dropdown.Toggle style={{ background: "transparent", border: "0px" }} id="dropdown-basic">
                         user name

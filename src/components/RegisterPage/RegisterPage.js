@@ -28,6 +28,7 @@ function RegisterPage() {
             const db = getDatabase();
             set(ref(db, "users/" + createdUser.user.uid), {
                 username: createdUser.user.displayName,
+                photoURL: `http://gravatar.com/avatar${md5(createdUser.user.email)}`,
             });
 
             setLoading(false);
