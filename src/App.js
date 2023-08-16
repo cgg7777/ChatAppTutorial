@@ -6,7 +6,7 @@ import LoginPage from "./components/LoginPage/LoginPage";
 import RegisterPage from "./components/RegisterPage/RegisterPage";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "./redux/actions/user_action";
+import { setUser, clearUser } from "./redux/actions/user_action";
 function App() {
     const auth = getAuth();
     const navigate = useNavigate();
@@ -20,6 +20,7 @@ function App() {
                 dispatch(setUser(user));
             } else {
                 navigate("/login");
+                dispatch(clearUser());
             }
         });
     }, []);
