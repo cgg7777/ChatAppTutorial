@@ -2,14 +2,15 @@ import React, { useRef } from "react";
 import { IoIosChatboxes } from "react-icons/io";
 import { Dropdown } from "react-bootstrap";
 import Image from "react-bootstrap/Image";
-import { useSelector } from "react-redux";
-import { getAuth, signOut } from "firebase/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { getAuth, signOut, updateProfile } from "firebase/auth";
 import mime from "mime-types";
-import { getDatabase } from "firebase/database";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
-
+import { getDatabase, set } from "firebase/database";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { setPhotoURL } from "../../../redux/actions/user_action";
 function UserPanel() {
     const user = useSelector((state) => state.user.currentUser);
+    const dispatch = useDispatch();
     const inputOpenImageRef = useRef();
     const handleOpenImageRef = () => {
         inputOpenImageRef.current.click();
@@ -22,11 +23,23 @@ function UserPanel() {
         const file = event.target.files[0];
         const metaData = { contentType: mime.lookup(file.name) };
         console.log(file);
-
+        const auth = getAuth();
+        const user = auth.currentUser;
         try {
             const storage = getStorage();
             const storageRef = ref(storage, `user_image/${user.uid}`);
             const uploadTaskSnapshot = await uploadBytes(storageRef, file, metaData);
+            const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
+            console.log(downloadURL);
+            await updateProfile(user, {
+                photoURL: `${downloadURL}`,
+            });
+            dispatch(setPhotoURL());
+
+            const db = getDatabase();
+            set(ref(db, "users/" + user.uid), {
+                photoURL: downloadURL,
+            });
         } catch (error) {
             console.log(error);
         }
@@ -49,13 +62,7 @@ function UserPanel() {
                     </Dropdown.Menu>
                 </Dropdown>
             </div>
-            <input
-                style={{ display: "none" }}
-                onChange={handleUploadImage}
-                accept="image/jpeg, image/png"
-                ref={inputOpenImageRef}
-                type="file"
-            />
+            <input style={{ display: "none" }} onChange={handleUploadImage} accept="image/jpeg, image/png" ref={inputOpenImageRef} type="file" />
         </div>
     );
 }
