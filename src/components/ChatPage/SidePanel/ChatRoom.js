@@ -4,13 +4,25 @@ import { FaPlus } from "react-icons/fa";
 import { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { connect } from "react-redux";
-import { getDatabase, push, ref, update } from "firebase/database";
+import { DataSnapshot, getDatabase, push, ref, update } from "firebase/database";
+import { onChildAdded } from "firebase/database";
 export class ChatRoom extends Component {
     state = {
         show: false,
         name: "",
         description: "",
         chatRoomsRef: ref(getDatabase(), "chatRooms"),
+        chatRooms: [],
+    };
+    componentDidMount() {
+        this.AddChatRoomsListensers();
+    }
+    AddChatRoomsListensers = () => {
+        let chatRoomsArray = [];
+        onChildAdded(this.state.chatRoomsRef, (DataSnapshot) => {
+            chatRoomsArray.push(DataSnapshot.val());
+            this.setState({ chatRooms: chatRoomsArray });
+        });
     };
     handleClose = () => this.setState({ show: false });
     handleShow = () => this.setState({ show: true });
@@ -50,6 +62,9 @@ export class ChatRoom extends Component {
         }
     };
     isFormValid = (name, description) => name && description;
+    renderChatRooms = (chatRooms) =>
+        chatRooms.length > 0 && chatRooms.map((room) => <li key={room.id}>#{room.name}</li>);
+
     render() {
         return (
             <div>
@@ -58,7 +73,7 @@ export class ChatRoom extends Component {
                     CHAT ROOMS (1)
                     <FaPlus onClick={this.handleShow} style={{ position: "absolute", right: "0", cursor: "pointer" }} />
                 </div>
-
+                <ul style={{ listStyleType: "none", padding: 0 }}>{this.renderChatRooms(this.state.chatRooms)}</ul>
                 <div>
                     <Modal show={this.state.show} onHide={this.handleClose}>
                         <Modal.Header closeButton>
@@ -68,12 +83,20 @@ export class ChatRoom extends Component {
                             <Form onSubmit={this.handleSubmit}>
                                 <Form.Group className="mb-3" controlId="formBasicEmail">
                                     <Form.Label>방 이름</Form.Label>
-                                    <Form.Control onChange={(e) => this.setState({ name: e.target.value })} type="text" placeholder="Enter a chat room name" />
+                                    <Form.Control
+                                        onChange={(e) => this.setState({ name: e.target.value })}
+                                        type="text"
+                                        placeholder="Enter a chat room name"
+                                    />
                                 </Form.Group>
 
                                 <Form.Group className="mb-3" controlId="formBasicPassword">
                                     <Form.Label>방 설명</Form.Label>
-                                    <Form.Control onChange={(e) => this.setState({ description: e.target.value })} type="text" placeholder="Enter a chat room description" />
+                                    <Form.Control
+                                        onChange={(e) => this.setState({ description: e.target.value })}
+                                        type="text"
+                                        placeholder="Enter a chat room description"
+                                    />
                                 </Form.Group>
                             </Form>
                         </Modal.Body>
