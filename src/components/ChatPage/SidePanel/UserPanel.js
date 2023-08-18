@@ -30,21 +30,15 @@ function UserPanel() {
             const storageRef = ref(storage, `user_image/${user.uid}`);
             const uploadTaskSnapshot = await uploadBytes(storageRef, file, metaData);
             const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
-            console.log(downloadURL);
             await updateProfile(user, {
                 photoURL: `${downloadURL}`,
             });
 
             dispatch(setPhotoURL(downloadURL));
             const db = getDatabase();
-            console.log("users/" + user.uid);
             set(dbRef(db, "users/" + user.uid), {
                 photoURL: downloadURL,
             });
-            // const updates = {};
-            // updates[`users/${user.uid}/photoURL`] = downloadURL;
-            // const db = getDatabase();
-            // update(ref(db), updates);
         } catch (error) {
             console.log(error);
         }
