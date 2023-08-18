@@ -5,7 +5,7 @@ import Image from "react-bootstrap/Image";
 import { useDispatch, useSelector } from "react-redux";
 import { getAuth, signOut, updateProfile } from "firebase/auth";
 import mime from "mime-types";
-import { getDatabase, set } from "firebase/database";
+import { getDatabase, set, update } from "firebase/database";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { setPhotoURL } from "../../../redux/actions/user_action";
 function UserPanel() {
@@ -34,12 +34,17 @@ function UserPanel() {
             await updateProfile(user, {
                 photoURL: `${downloadURL}`,
             });
-            dispatch(setPhotoURL());
 
+            dispatch(setPhotoURL(downloadURL));
             const db = getDatabase();
+            console.log("users/" + user.uid);
             set(ref(db, "users/" + user.uid), {
                 photoURL: downloadURL,
             });
+            // const updates = {};
+            // updates[`users/${user.uid}/photoURL`] = downloadURL;
+            // const db = getDatabase();
+            // update(ref(db), updates);
         } catch (error) {
             console.log(error);
         }
