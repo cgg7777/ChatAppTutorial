@@ -1,10 +1,9 @@
 import React, { Component } from "react";
 import { FaRegSmileWink } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
-import { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { connect } from "react-redux";
-import { DataSnapshot, getDatabase, push, ref, update } from "firebase/database";
+import { DataSnapshot, getDatabase, off, push, ref, update } from "firebase/database";
 import { setCurrentChatRoom } from "../../../redux/actions/chatRoom_action";
 import { onChildAdded } from "firebase/database";
 export class ChatRoom extends Component {
@@ -19,6 +18,9 @@ export class ChatRoom extends Component {
     };
     componentDidMount() {
         this.AddChatRoomsListensers();
+    }
+    componentWillUnmount() {
+        off(this.state.chatRoomsRef);
     }
     setFirstChatRoom() {
         const firstChatRoom = this.state.chatRooms[0];
@@ -59,7 +61,6 @@ export class ChatRoom extends Component {
             },
         };
         try {
-            const db = getDatabase();
             const updates = {};
             updates[key] = newChatRoom;
             await update(this.state.chatRoomsRef, updates);
@@ -81,7 +82,7 @@ export class ChatRoom extends Component {
         chatRooms.length > 0 &&
         chatRooms.map((room) => (
             <li
-                style={{ backgroundColor: room.id == this.state.activeChatRoomID && "#ffffff45" }}
+                style={{ backgroundColor: room.id === this.state.activeChatRoomID && "#ffffff45" }}
                 onClick={() => this.changeChatRoom(room)}
                 key={room.id}
             >
