@@ -6,7 +6,16 @@ import ChatRoom from "./ChatRoom";
 
 function SidePanel() {
     return (
-        <div style={{ background: "#7B83EB", padding: "2rem", minHeight: "100vh", color: "white", minWidth: "275px" }}>
+        <div
+            style={{
+                background: "#7B83EB",
+                padding: "2rem",
+                minHeight: "100vh",
+                color: "white",
+                minWidth: "275px",
+                height: "100%",
+            }}
+        >
             <UserPanel />
             <Favorite />
             <ChatRoom />
