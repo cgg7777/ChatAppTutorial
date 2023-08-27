@@ -3,7 +3,7 @@ import { FloatingLabel, Form, ProgressBar, Row, Col } from "react-bootstrap";
 import { getDatabase, ref, set, push, child, serverTimestamp } from "firebase/database";
 import { useSelector } from "react-redux";
 import mime from "mime-types";
-import { getStorage, uploadBytesResumable, ref as storRef } from "firebase/storage";
+import { getStorage, uploadBytesResumable, ref as storRef, getDownloadURL } from "firebase/storage";
 
 function MessageForm() {
     const [content, setContent] = useState("");
@@ -16,35 +16,6 @@ function MessageForm() {
     const chatRoom = useSelector((state) => state.chatRoom.currentChatRoom);
     const user = useSelector((state) => state.user.currentUser);
     const inputOpenImageRef = useRef();
-    const handleOpenImageRef = () => {
-        inputOpenImageRef.current.click();
-    };
-    const handleUploadImage = (event) => {
-        const file = event.target.files[0];
-        const metaData = { contentType: mime.lookup(file.name) };
-        const filePath = `message/public/${file.name}`;
-        try {
-            const storage = getStorage();
-            const storageRef = storRef(storage, filePath);
-            const uploadTaskSnapshot = uploadBytesResumable(storageRef, file, metaData);
-            uploadTaskSnapshot.on(
-                "state_changed",
-                (snapshot) => {
-                    const progress = Math.round(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    setPercentage(progress);
-                    setVisibleProgress(true);
-                },
-                (error) => {
-                    // Handle unsuccessful uploads
-                },
-                () => {
-                    setVisibleProgress(false);
-                }
-            );
-        } catch (error) {
-            console.log(error);
-        }
-    };
     const createMessage = (fileurl = null) => {
         serverTimestamp(getDatabase());
         const message = {
@@ -62,6 +33,42 @@ function MessageForm() {
         }
         return message;
     };
+    const handleOpenImageRef = () => {
+        inputOpenImageRef.current.click();
+    };
+    const handleUploadImage = (event) => {
+        const file = event.target.files[0];
+        const metaData = { contentType: mime.lookup(file.name) };
+        const filePath = `message/public/${file.name}`;
+        setLoading(true);
+        try {
+            const storage = getStorage();
+            const storageRef = storRef(storage, filePath);
+            const uploadTask = uploadBytesResumable(storageRef, file, metaData);
+            uploadTask.on(
+                "state_changed",
+                (snapshot) => {
+                    const progress = Math.round(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    setPercentage(progress);
+                    setVisibleProgress(true);
+                },
+                (error) => {
+                    // Handle unsuccessful uploads
+                    setLoading(false);
+                },
+                () => {
+                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                        set(push(child(messageRef, chatRoom.id)), createMessage(downloadURL));
+                    });
+                    setVisibleProgress(false);
+                    setLoading(false);
+                }
+            );
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     const handleSubmit = async () => {
         if (!content) {
             setErrors((prev) => prev.concat("Type contents first"));
@@ -101,18 +108,18 @@ function MessageForm() {
             </div>
             <Row>
                 <Col>
-                    <button onClick={handleSubmit} className="message-form-button" style={{ width: "100%" }}>
+                    <button onClick={handleSubmit} className="message-form-button" style={{ width: "100%" }} disabled={loading ? true : false}>
                         SEND
                     </button>
                 </Col>
 
                 <Col>
-                    <button onClick={handleOpenImageRef} className="message-form-button" style={{ width: "100%" }}>
+                    <button onClick={handleOpenImageRef} className="message-form-button" style={{ width: "100%" }} disabled={loading ? true : false}>
                         UPLOAD
                     </button>
                 </Col>
             </Row>
-            <input type="file" style={{ display: "none" }} onChange={handleUploadImage} ref={inputOpenImageRef} />
+            <input accept="image/jpeg, image/png" type="file" style={{ display: "none" }} onChange={handleUploadImage} ref={inputOpenImageRef} />
         </div>
     );
 }
