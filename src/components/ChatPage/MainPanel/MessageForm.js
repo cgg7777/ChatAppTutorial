@@ -3,12 +3,14 @@ import { FloatingLabel, Form, ProgressBar, Row, Col } from "react-bootstrap";
 import { getDatabase, ref, set, push, child, serverTimestamp } from "firebase/database";
 import { useSelector } from "react-redux";
 import mime from "mime-types";
-import { getStorage, uploadBytes, ref as storRef } from "firebase/storage";
+import { getStorage, uploadBytesResumable, ref as storRef } from "firebase/storage";
 
 function MessageForm() {
     const [content, setContent] = useState("");
     const [errors, setErrors] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [percentage, setPercentage] = useState(0);
+    const [visibleProgress, setVisibleProgress] = useState(false);
     const db = getDatabase();
     const messageRef = ref(db, "messages");
     const chatRoom = useSelector((state) => state.chatRoom.currentChatRoom);
@@ -17,14 +19,28 @@ function MessageForm() {
     const handleOpenImageRef = () => {
         inputOpenImageRef.current.click();
     };
-    const handleUploadImage = async (event) => {
+    const handleUploadImage = (event) => {
         const file = event.target.files[0];
         const metaData = { contentType: mime.lookup(file.name) };
         const filePath = `message/public/${file.name}`;
         try {
             const storage = getStorage();
             const storageRef = storRef(storage, filePath);
-            const uploadTaskSnapshot = await uploadBytes(storageRef, file, metaData);
+            const uploadTaskSnapshot = uploadBytesResumable(storageRef, file, metaData);
+            uploadTaskSnapshot.on(
+                "state_changed",
+                (snapshot) => {
+                    const progress = Math.round(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    setPercentage(progress);
+                    setVisibleProgress(true);
+                },
+                (error) => {
+                    // Handle unsuccessful uploads
+                },
+                () => {
+                    setVisibleProgress(false);
+                }
+            );
         } catch (error) {
             console.log(error);
         }
@@ -74,8 +90,8 @@ function MessageForm() {
                     <Form.Control as="textarea" onChange={handleChange} row={3} style={{}} />
                 </FloatingLabel>
             </Form>
+            {visibleProgress && <ProgressBar variant="warning" label={`${percentage}`} now={percentage} />}
 
-            <ProgressBar variant="warning" label="60%" now={60} />
             <div>
                 {errors.map((errorMsg) => (
                     <p style={{ color: "red" }} key={errorMsg}>
