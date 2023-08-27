@@ -3,7 +3,7 @@ import { Row, Col, Image, Container, InputGroup, Form, Accordion } from "react-b
 import { FaLock } from "react-icons/fa";
 import { MdFavorite } from "react-icons/md";
 import { AiOutlineSearch } from "react-icons/ai";
-function MessageHeader() {
+function MessageHeader({ handleSearchChange }) {
     return (
         <div
             style={{
@@ -27,11 +27,7 @@ function MessageHeader() {
                             <InputGroup.Text id="basic-addon1">
                                 <AiOutlineSearch />
                             </InputGroup.Text>
-                            <Form.Control
-                                placeholder="Search Messages"
-                                aria-label="Search"
-                                aria-describedby="basic-addon1"
-                            />
+                            <Form.Control onChange={handleSearchChange} placeholder="Search Messages" aria-label="Search" aria-describedby="basic-addon1" />
                         </InputGroup>
                     </Col>
                 </Row>
@@ -46,12 +42,9 @@ function MessageHeader() {
                             <Accordion.Item eventKey="0">
                                 <Accordion.Header>Accordion Item #1</Accordion.Header>
                                 <Accordion.Body>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                    exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                                    irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-                                    pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-                                    deserunt mollit anim id est laborum.
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                                    commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
+                                    anim id est laborum.
                                 </Accordion.Body>
                             </Accordion.Item>
                         </Accordion>
@@ -61,12 +54,9 @@ function MessageHeader() {
                             <Accordion.Item eventKey="1">
                                 <Accordion.Header>Accordion Item #2</Accordion.Header>
                                 <Accordion.Body>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                    exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                                    irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-                                    pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-                                    deserunt mollit anim id est laborum.
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                                    commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
+                                    anim id est laborum.
                                 </Accordion.Body>
                             </Accordion.Item>
                         </Accordion>
