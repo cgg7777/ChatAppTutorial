@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { FloatingLabel, Form, ProgressBar, Row, Col } from "react-bootstrap";
 import { getDatabase, ref, set, push, child, serverTimestamp } from "firebase/database";
 import { useSelector } from "react-redux";
+import mime from "mime-types";
+import { getStorage, uploadBytes, ref as storRef } from "firebase/storage";
 
 function MessageForm() {
     const [content, setContent] = useState("");
@@ -11,7 +13,22 @@ function MessageForm() {
     const messageRef = ref(db, "messages");
     const chatRoom = useSelector((state) => state.chatRoom.currentChatRoom);
     const user = useSelector((state) => state.user.currentUser);
-
+    const inputOpenImageRef = useRef();
+    const handleOpenImageRef = () => {
+        inputOpenImageRef.current.click();
+    };
+    const handleUploadImage = async (event) => {
+        const file = event.target.files[0];
+        const metaData = { contentType: mime.lookup(file.name) };
+        const filePath = `message/public/${file.name}`;
+        try {
+            const storage = getStorage();
+            const storageRef = storRef(storage, filePath);
+            const uploadTaskSnapshot = await uploadBytes(storageRef, file, metaData);
+        } catch (error) {
+            console.log(error);
+        }
+    };
     const createMessage = (fileurl = null) => {
         serverTimestamp(getDatabase());
         const message = {
@@ -74,11 +91,12 @@ function MessageForm() {
                 </Col>
 
                 <Col>
-                    <button onClick={handleSubmit} className="message-form-button" style={{ width: "100%" }}>
+                    <button onClick={handleOpenImageRef} className="message-form-button" style={{ width: "100%" }}>
                         UPLOAD
                     </button>
                 </Col>
             </Row>
+            <input type="file" style={{ display: "none" }} onChange={handleUploadImage} ref={inputOpenImageRef} />
         </div>
     );
 }

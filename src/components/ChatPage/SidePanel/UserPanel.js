@@ -22,7 +22,7 @@ function UserPanel() {
     const handleUploadImage = async (event) => {
         const file = event.target.files[0];
         const metaData = { contentType: mime.lookup(file.name) };
-        console.log(file);
+
         const auth = getAuth();
         const user = auth.currentUser;
         try {
